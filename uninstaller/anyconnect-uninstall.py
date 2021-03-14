@@ -63,9 +63,14 @@ def get_paths_to_delete(filename):
     return paths_list
 
 
+def make_list_from_cmd_output(command, splitter=None):
+    out_str = subprocess.check_output(command).decode("utf-8")
+    result_list = out_str.split(splitter)
+    return result_list
+
+
 def get_logged_on_user():
-    windows_sessions = subprocess.check_output("qwinsta").decode("utf-8")
-    values_list = windows_sessions.split()
+    values_list = make_list_from_cmd_output("qwinsta")
     logged_on_user = ""
     for i in range(len(values_list)):
         try:
@@ -78,15 +83,30 @@ def get_logged_on_user():
 
 
 def get_sid_of_logged_on_user(logged_on_user):
-    cmd_to_get_sid = (
-                     "wmic useraccount where name='{}' get sid"
-                     .format(logged_on_user)
+    values_list = make_list_from_cmd_output(
+        "reg query \"HKLM\\SOFTWARE\\Microsoft\\"
+        "Windows NT\\CurrentVersion\\ProfileList\"",
+        "\r\n"
     )
-    windows_sid_information = (
-        subprocess.check_output(cmd_to_get_sid).decode("utf-8")
-    )
-    values_list = windows_sid_information.split()
-    sid_of_logged_on_user = values_list[1]
+    paths_list = []
+    sid_of_logged_on_user = ""
+    for i in range(len(values_list)):
+        if values_list[i].startswith("HKEY_LOCAL_MACHINE"):
+            paths_list.append(values_list[i])
+    # print(paths_list)
+    for i in range(1, len(paths_list)):
+        current_key_list = make_list_from_cmd_output(
+            "reg query \"{}\" /v ProfileImagePath ".format(paths_list[i]),
+            "\r\n"
+        )
+        # Берем 3-ий элемент с конца, сплитим эту строку по пробелам
+        # Из полученного списка берем последний элемент-строку
+        # И делаем ее в нижнем регистре
+        if current_key_list[-3].split()[-1].lower() == (
+                  ("C:\\Users\\"+logged_on_user).lower()):
+            # Сплитим путь по обратному слешу, в самом конце пути лежит сид
+            sid_of_logged_on_user = paths_list[i].split("\\")[-1]
+            break
     return sid_of_logged_on_user
 
 

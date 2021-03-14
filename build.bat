@@ -1,1 +1,1 @@
-pyinstaller --clean -F --noconfirm --icon=icon.ico anyconnect-uninstall.spec
+pyinstaller --clean -F --noconfirm --icon=icon.ico anyconnect-uninstaller.spec
