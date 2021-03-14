@@ -1,0 +1,4 @@
+\.cisco
+\AppData\Local\Cisco\Cisco AnyConnect Secure Mobility Client
+C:\ProgramData\Cisco\Cisco AnyConnect Secure Mobility Client
+C:\ProgramData\Cisco\Cisco AnyConnect VPN Client
