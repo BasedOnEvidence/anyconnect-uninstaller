@@ -5,10 +5,10 @@ spec_root = os.path.abspath(SPECPATH)
 block_cipher = None
 
 
-a = Analysis(['anyconnect-uninstall.py'],
+a = Analysis(['uninstaller\\anyconnect-uninstall.py'],
              pathex=[spec_root],
              binaries=[],
-             datas=[('paths-to-delete.txt', '.'), ('keys-to-delete.txt', '.')],
+             datas=[('uninstaller\\paths-to-delete.txt', '.'), ('uninstaller\\keys-to-delete.txt', '.')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
