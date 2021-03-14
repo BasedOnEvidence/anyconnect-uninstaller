@@ -23,6 +23,16 @@ def is_admin():
         return False
 
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.environ.get("_MEIPASS2", os.path.abspath("."))
+    return os.path.join(base_path, relative_path)
+
+
 # По пути, названию ключа, его номеру и названию значения вернуть значение
 # Переписать виндовыми функциями конечно
 def get_subkey_value_data(winreg_root_key, path, key, key_num, value_name):
@@ -47,7 +57,7 @@ def get_subkey_value_data(winreg_root_key, path, key, key_num, value_name):
 
 
 def get_paths_to_delete(filename):
-    with open(filename, "r") as path_file:
+    with open(resource_path(filename), "r") as path_file:
         paths_list = path_file.read().splitlines()
     path_file.close()
     return paths_list

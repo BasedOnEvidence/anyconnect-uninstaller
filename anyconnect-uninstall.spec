@@ -17,23 +17,21 @@ a = Analysis(['uninstaller\\anyconnect-uninstall.py'],
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
+a.datas += [('icon.ico','icon.ico','DATA')]
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
           a.scripts,
+          a.binaries,
+          a.zipfiles,
+          a.datas,
           [],
-          exclude_binaries=True,
           name='anyconnect-uninstall',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          console=True )
-coll = COLLECT(exe,
-               a.binaries,
-               a.zipfiles,
-               a.datas,
-               strip=False,
-               upx=True,
-               upx_exclude=[],
-               name='anyconnect-uninstall')
+          upx_exclude=[],
+          runtime_tmpdir=None,
+          console=True,
+          icon='icon.ico' )
