@@ -1,8 +1,8 @@
 import winreg
 import os
-import shutil
 import ctypes
 import sys
+import subprocess
 
 '''
 1. Check this:
@@ -11,7 +11,8 @@ HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall
 (no need) HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall
 2. Find Cisco Anyconnect remove commands
 3. Run them
-4. Clear trash manualy
+4. Clear trash folders
+5. Clear trash reg keys
 '''
 
 
@@ -22,131 +23,64 @@ def is_admin():
         return False
 
 
+# По пути, названию ключа, его номеру и названию значения вернуть значение
+# Переписать виндовыми функциями конечно
 def get_subkey_value_data(winreg_root_key, path, key, key_num, value_name):
     current_sub_key = winreg.EnumKey(
         key, key_num
     )
     sub_path = path + "\\" + current_sub_key
-    sub_key = winreg.OpenKey(
-        winreg_root_key, sub_path, 0, winreg.KEY_READ
-    )
     try:
+        sub_key = winreg.OpenKey(
+            winreg_root_key, sub_path, 0, winreg.KEY_READ
+        )
         value = None
         regtype = None
         value, regtype = winreg.QueryValueEx(
             sub_key, value_name
         )
+        winreg.CloseKey(sub_key)
     except WindowsError:
         pass
     finally:
-        winreg.CloseKey(sub_key)
         return current_sub_key, value
 
 
-def get_subkey_name_from_path(path):
-    cur_str = path
-    if "\\" in path:
-        subkey_name = cur_str.split("\\")[-1]
-    else:
-        subkey_name = cur_str
-    return subkey_name
-
-
-def get_parent_key_path(path):
-    cur_str = path
-    suffix = get_subkey_name_from_path(cur_str)
-    if suffix != "":
-        suffix = "\\" + suffix
-        cur_str = cur_str[:len(cur_str)-len(suffix)]
-    else:
-        cur_str = ""
-    return cur_str
-
-
-def split_keys_list(keys_list):
-    HKCR_list = []
-    HKLM_list = []
-    HKU_list = []
-    HKCR_index = keys_list.index("HKEY_CLASSES_ROOT")
-    HKLM_index = keys_list.index("HKEY_LOCAL_MACHINE")
-    HKU_index = keys_list.index("HKEY_USERS")
-    for i in range(HKCR_index + 1, HKLM_index):
-        HKCR_list.append(keys_list[i])
-    for i in range(HKLM_index + 1, HKU_index):
-        HKLM_list.append(keys_list[i])
-    for i in range(HKU_index + 1, len(keys_list)):
-        HKU_list.append(keys_list[i])
-    return HKCR_list, HKLM_list, HKU_list
-
-
 def get_paths_to_delete(filename):
-    with open(filename, "r") as key_file:
-        paths_list = key_file.read().splitlines()
-    key_file.close()
+    with open(filename, "r") as path_file:
+        paths_list = path_file.read().splitlines()
+    path_file.close()
     return paths_list
 
 
-def get_user_folders():
-    path = "C:/Users"
-    for dirs, folder, files in os.walk(path):
-        dir_list = folder
-        break
-    return dir_list
+def get_logged_on_user():
+    windows_sessions = subprocess.check_output("qwinsta").decode("utf-8")
+    values_list = windows_sessions.split()
+    logged_on_user = ""
+    for i in range(len(values_list)):
+        try:
+            if values_list[i][0] == '>':
+                logged_on_user = values_list[i+1]
+                break
+        except IndexError:
+            pass
+    return logged_on_user
 
 
-def delete_subkey(winreg_root_key, path):
-    try:
-        parent_key_path = get_parent_key_path(path)
-        parent_key = winreg.OpenKey(
-            winreg_root_key, parent_key_path, 0, winreg.KEY_ALL_ACCESS
-        )
-        subkey_name = get_subkey_name_from_path(path)
-        winreg.DeleteKey(parent_key, subkey_name)
-        winreg.CloseKey(parent_key)
-    except WindowsError:
-        pass
+def get_sid_of_logged_on_user(logged_on_user):
+    cmd_to_get_sid = (
+                     "wmic useraccount where name='{}' get sid"
+                     .format(logged_on_user)
+    )
+    windows_sid_information = (
+        subprocess.check_output(cmd_to_get_sid).decode("utf-8")
+    )
+    values_list = windows_sid_information.split()
+    sid_of_logged_on_user = values_list[1]
+    return sid_of_logged_on_user
 
 
-def delete_value(winreg_root_key, path, value_name):
-    try:
-        target_key = winreg.OpenKey(
-            winreg.winreg_root_key, path, 0, winreg.KEY_ALL_ACCESS
-        )
-        winreg.DeleteValue(target_key, value_name)
-        winreg.CloseKey(target_key)
-    except WindowsError:
-        pass
-
-
-def get_subkeys_names(winreg_root_key, path):
-    key_num = 0
-    subkeys_list = []
-    try:
-        root_key = winreg.OpenKey(
-            winreg_root_key, path, 0, winreg.KEY_READ
-        )
-        while True:
-            current_sub_key = winreg.EnumKey(
-                root_key, key_num
-            )
-            subkeys_list.append(current_sub_key)
-            key_num += 1
-    except WindowsError:
-        pass
-    finally:
-        winreg.CloseKey(root_key)
-        return subkeys_list
-
-
-def filter_sids(sids_list):
-    i = 0
-    while i < len(sids_list):
-        if 41 < len(sids_list[i]) < 50:
-            i += 1
-        else:
-            del sids_list[i]
-
-
+# Получение команд удаления всех модулей anyconnect, которые установлены
 def get_anyconnect_uninstall_commands(winreg_root_key, reg_path):
     MSIEXEC_DEF_SUBSTRING = "MsiExec.exe /X"
     ANYCONNECT_DEF_SUBSTRING = "Cisco AnyConnect"
@@ -176,12 +110,15 @@ def get_anyconnect_uninstall_commands(winreg_root_key, reg_path):
                         if MSIEXEC_DEF_SUBSTRING in uninstall_string_data:
                             uninstall_string_data = uninstall_string_data + \
                                                     " /qn /norestart"
+                            # Удаление основного модуля добавим в конец списка
                             if uninstall_string_data != ANYCONNECT_DEF_STRING:
                                 remove_commands_list.append(
                                     uninstall_string_data
                                 )
                             else:
                                 core_module_uninstall = uninstall_string_data
+            # Key_num нужен для уникальных сабкеев.
+            # Явно лишняя вся эта история, надо убрать
             key_num += 1
         winreg.CloseKey(registry_key_with_uninstall_info)
     except WindowsError:
@@ -192,6 +129,8 @@ def get_anyconnect_uninstall_commands(winreg_root_key, reg_path):
         return remove_commands_list
 
 
+# Функция запускает msiexec /x всех модулей,
+# которые видны в programs and features
 def run_uninstall_commands(remove_commands_list):
     commands_count = len(remove_commands_list)
     os.system("net stop aciseagent")
@@ -203,41 +142,31 @@ def run_uninstall_commands(remove_commands_list):
         os.system(remove_commands_list[i])
 
 
-def clear_trash():
-    path_list = get_paths_to_delete("paths_to_delete.txt")
-    dir_list = get_user_folders()
+def clear_trash(logged_on_user):
+    path_list = get_paths_to_delete("paths-to-delete.txt")
+    delete_command = "rmdir /s /q "
     for i in range(len(path_list)):
-        if path_list[i].startswith("\\"):
-            for j in range(len(dir_list)):
-                dir_to_rm = "C:\\users\\" + dir_list[j] + path_list[i]
-                shutil.rmtree(dir_to_rm, ignore_errors=True)
-        else:
-            try:
-                shutil.rmtree(path_list[i], ignore_errors=True)
-            except WindowsError:
-                pass
+        if path_list[i].startswith(r"%userprofile%"):
+            path_list[i] = path_list[i].replace(
+                        r"%userprofile%",
+                        "C:\\users\\{}".format(logged_on_user)
+                        )
+        os.system(delete_command + '"' + path_list[i] + '"')
 
 
-def delete_subkeys_list(winreg_root_key, keys_list, user_sids=[]):
-    if user_sids != []:
-        for i in range(len(user_sids)):
-            for j in range(len(keys_list)):
-                path_to_delete = user_sids[i] + "\\" + keys_list[j]
-                delete_subkey(winreg_root_key, path_to_delete)
-    else:
-        for i in range(len(keys_list)):
-            delete_subkey(winreg_root_key, keys_list[i])
-
-
-def clear_registry():
-    user_sids = []
-    user_sids.extend(get_subkeys_names(winreg.HKEY_USERS, ""))
-    filter_sids(user_sids)
-    keys_list = get_paths_to_delete("keys_to_delete.txt")
-    HKCR_keys_list, HKLM_keys_list, HKU_keys_list = split_keys_list(keys_list)
-    delete_subkeys_list(winreg.HKEY_CLASSES_ROOT, HKCR_keys_list)
-    delete_subkeys_list(winreg.HKEY_LOCAL_MACHINE, HKLM_keys_list)
-    delete_subkeys_list(winreg.HKEY_USERS, HKU_keys_list, user_sids)
+def clear_registry(sid_of_logged_on_user):
+    start_reg_path = "HKU\\{}".format(sid_of_logged_on_user)
+    start_delete_command = "reg delete "
+    end_delete_command = " /f"
+    keys_list = get_paths_to_delete("keys-to-delete.txt")
+    for i in range(len(keys_list)):
+        if keys_list[i].startswith("HKCU"):
+            keys_list[i] = keys_list[i].replace("HKCU", start_reg_path)
+        os.system(
+            start_delete_command +
+            '"' + keys_list[i] + '"' +
+            end_delete_command
+        )
 
 
 def uninstall_anyconnect():
@@ -255,6 +184,7 @@ def uninstall_anyconnect():
     remove_commands_list.extend(get_anyconnect_uninstall_commands(
         winreg.HKEY_LOCAL_MACHINE, UNINSTALL_HKLM_PATH_X32_COMPATIBILITY
     ))
+    # Далее ожидается extend [], это пользовательская ветка администратора
     remove_commands_list.extend(get_anyconnect_uninstall_commands(
         winreg.HKEY_CURRENT_USER, UNINSTALL_HKCU_PATH
     ))
@@ -264,12 +194,14 @@ def uninstall_anyconnect():
 def main():
     if is_admin():
         uninstall_anyconnect()
-        clear_registry()
-        clear_trash()
-        print("\nDone! Restart required.")
+        logged_on_user = get_logged_on_user()
+        sid_of_logged_on_user = get_sid_of_logged_on_user(logged_on_user)
+        clear_trash(logged_on_user)
+        clear_registry(sid_of_logged_on_user)
+        os.system("pause")
     else:
         ctypes.windll.shell32.ShellExecuteW(
-            None, "runas", sys.executable, " ".join(sys.argv), None, 1
+            None, "runas", sys.executable, __file__, None, 1
         )
 
 
