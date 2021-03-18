@@ -4,16 +4,17 @@ import ctypes
 import sys
 import subprocess
 
-'''
-1. Check this:
-HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall
-HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall
-(no need) HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall
-2. Find Cisco Anyconnect remove commands
-3. Run them
-4. Clear trash folders
-5. Clear trash reg keys
-'''
+
+# 1. Check this:
+# HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
+# HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall
+# (no need) HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall
+# (no need) HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\
+#           Installer\UserData\S-1-5-18\Products\
+# 2. Find Cisco Anyconnect remove commands
+# 3. Run them
+# 4. Clear trash folders
+# 5. Clear trash reg keys
 
 
 def is_admin():
@@ -24,7 +25,7 @@ def is_admin():
 
 
 def resource_path(relative_path):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
+    # Get absolute path to resource, works for dev and for PyInstaller
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
