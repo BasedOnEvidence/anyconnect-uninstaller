@@ -3,6 +3,7 @@ import os
 import ctypes
 import sys
 import subprocess
+import time
 
 
 # 1. Check this:
@@ -32,6 +33,16 @@ def resource_path(relative_path):
     except Exception:
         base_path = os.environ.get("_MEIPASS2", os.path.abspath("."))
     return os.path.join(base_path, relative_path)
+
+
+def reboot_system():
+    # reboot_status = False
+    user_reboot_desire = input("Do you want to reboot this machine? [Y/N]: ")
+    if user_reboot_desire == 'y' or user_reboot_desire == 'Y':
+        os.system("shutdown -r -t 0")
+    else:
+        print("Reboot cancelled")
+    time.sleep(1)
 
 
 # По пути, названию ключа, его номеру и названию значения вернуть значение
@@ -182,10 +193,11 @@ def clear_trash(logged_on_user):
                         r"%userprofile%",
                         "C:\\users\\{}".format(logged_on_user)
                         )
+        print("Deleting {}".format(path_list[i]))
         os.system(delete_command + '"' + path_list[i] + '"')
 
 
-def clear_registry(sid_of_logged_on_user):
+def clear_registry(sid_of_logged_on_user=""):
     start_reg_path = "HKU\\{}".format(sid_of_logged_on_user)
     start_delete_command = "reg delete "
     end_delete_command = " /f"
@@ -193,6 +205,7 @@ def clear_registry(sid_of_logged_on_user):
     for i in range(len(keys_list)):
         if keys_list[i].startswith("HKCU"):
             keys_list[i] = keys_list[i].replace("HKCU", start_reg_path)
+        print("Deleting {}".format(keys_list[i]))
         os.system(
             start_delete_command +
             '"' + keys_list[i] + '"' +
@@ -227,9 +240,11 @@ def main():
         uninstall_anyconnect()
         logged_on_user = get_logged_on_user()
         sid_of_logged_on_user = get_sid_of_logged_on_user(logged_on_user)
+        print("Logged on user: {}. Sid: {}".format(logged_on_user,
+                                                   sid_of_logged_on_user))
         clear_trash(logged_on_user)
         clear_registry(sid_of_logged_on_user)
-        os.system("pause")
+        reboot_system()
     else:
         ctypes.windll.shell32.ShellExecuteW(
             None, "runas", sys.executable, __file__, None, 1
