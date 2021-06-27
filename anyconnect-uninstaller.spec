@@ -5,10 +5,15 @@ spec_root = os.path.abspath(SPECPATH)
 block_cipher = None
 
 
-a = Analysis(['uninstaller\\anyconnect-uninstall.py'],
+a = Analysis(['uninstaller\\scripts\\run.py'],
              pathex=[spec_root],
-             binaries=[],
-             datas=[('uninstaller\\paths-to-delete.txt', '.'), ('uninstaller\\keys-to-delete.txt', '.')],
+             binaries=[
+                 ('uninstaller\\executable\\PurgeNotifyObjects.exe', '.')
+             ],
+             datas=[
+                 ('uninstaller\\data\\paths-to-delete.txt', '.'),
+                 ('uninstaller\\data\\keys-to-delete.txt', '.')
+                ],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -34,4 +39,5 @@ exe = EXE(pyz,
           upx_exclude=[],
           runtime_tmpdir=None,
           console=True,
+          uac_admin=True,
           icon='icon.ico' )
