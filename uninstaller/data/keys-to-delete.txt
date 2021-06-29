@@ -56,3 +56,4 @@ HKCU\AppEvents\EventLabels\ACVPNCredentialRequest
 HKCU\AppEvents\Schemes\Apps\vpnui
 HKCU\Software\Cisco\Cisco AnyConnect Secure Mobility Client
 HKCU\Software\Microsoft\Windows\CurrentVersion\PushNotifications\Backup\Cisco.AnyConnect
+HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Cisco.AnyConnect

@@ -1,5 +1,4 @@
 import os
-import time
 
 from uninstaller.getsystemdata import (
     get_logged_on_user, get_sid_of_logged_on_user, get_uninstall_strings_list
@@ -16,22 +15,6 @@ from uninstaller.loader import get_paths_to_delete, get_resource_path
 # 3. Run them
 # 4. Clear trash folders
 # 5. Clear trash reg keys
-
-
-def reboot_system(restart_param):
-    # reboot_status = False
-    user_reboot_desire = restart_param
-    if restart_param == 'ask':
-        user_reboot_desire = input(
-            "Do you want to reboot this machine? [Y/N]: "
-        )
-    if (user_reboot_desire == 'y' or
-            user_reboot_desire == 'Y' or
-            user_reboot_desire == 'yes'):
-        os.system("shutdown -r -t 0")
-    else:
-        print("Reboot cancelled")
-    time.sleep(1)
 
 
 # Функция запускает msiexec /x всех модулей,
@@ -78,7 +61,7 @@ def clear_registry(sid_of_logged_on_user=""):
         )
 
 
-def uninstall_anyconnect(restart_param):
+def uninstall_anyconnect():
     remove_commands_list = get_uninstall_strings_list()
     run_uninstall_commands(remove_commands_list)
     executable_path = get_resource_path(
@@ -91,4 +74,3 @@ def uninstall_anyconnect(restart_param):
                                                sid_of_logged_on_user))
     clear_trash(logged_on_user)
     clear_registry(sid_of_logged_on_user)
-    reboot_system(restart_param)
