@@ -1,9 +1,10 @@
-import os
+import subprocess
 
 from uninstaller.getsystemdata import (
     get_logged_on_user, get_sid_of_logged_on_user, get_uninstall_strings_list
 )
 from uninstaller.loader import get_paths_to_delete, get_resource_path
+from uninstaller.logger import get_logger
 
 # 1. Check this:
 # HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
@@ -16,20 +17,24 @@ from uninstaller.loader import get_paths_to_delete, get_resource_path
 # 4. Clear trash folders
 # 5. Clear trash reg keys
 
+logger = get_logger(__name__)
+
 
 # Функция запускает msiexec /x всех модулей,
 # которые видны в programs and features
 def run_uninstall_commands(remove_commands_list):
-    commands_count = len(remove_commands_list)
-    os.system('net stop aciseagent')
-    os.system('net stop nam')
-    os.system('net stop namlm')
-    os.system('net stop vpnagent')
-    os.system('taskkill /F /IM vpnui.exe')
-    os.system('taskkill /F /IM vpnagent.exe')
-    for i in range(commands_count):
-        print(remove_commands_list[i])
-        os.system(remove_commands_list[i])
+    logger.info(
+        subprocess.run('taskkill /F /IM vpnui.exe',  capture_output=True)
+    )
+    logger.info(
+        subprocess.run('taskkill /F /IM vpnagent.exe',  capture_output=True)
+    )
+    logger.info(subprocess.run('net stop aciseagent',  capture_output=True))
+    logger.info(subprocess.run('net stop nam',  capture_output=True))
+    logger.info(subprocess.run('net stop namlm',  capture_output=True))
+    logger.info(subprocess.run('net stop vpnagent',  capture_output=True))
+    for cmd in remove_commands_list:
+        logger.info(subprocess.run(cmd,  capture_output=True))
 
 
 def clear_trash(logged_on_user):
@@ -37,28 +42,45 @@ def clear_trash(logged_on_user):
     delete_command = "rmdir /s /q "
     for i in range(len(path_list)):
         if path_list[i].startswith(r"%userprofile%"):
-            path_list[i] = path_list[i].replace(
-                        r"%userprofile%",
-                        "C:\\users\\{}".format(logged_on_user)
-                        )
-        print("Deleting {}".format(path_list[i]))
-        os.system(delete_command + '"' + path_list[i] + '"')
+            if logged_on_user != '':
+                path_list[i] = path_list[i].replace(
+                            r"%userprofile%",
+                            'C:\\users\\{}'.format(logged_on_user)
+                            )
+            else:
+                path_list.pop[i]
+    for i in range(len(path_list)):
+        logger.info('Deleting {}'.format(path_list[i]))
+        try:
+            logger.info(subprocess.run(
+                delete_command + '"' + path_list[i] + '"',
+                capture_output=True
+            ))
+        except WindowsError as err:
+            logger.warning('Unable to delete {}. {}'.format(
+                path_list[i], err
+            ))
+            pass
 
 
-def clear_registry(sid_of_logged_on_user=""):
-    start_reg_path = "HKU\\{}".format(sid_of_logged_on_user)
-    start_delete_command = "reg delete "
-    end_delete_command = " /f"
+def clear_registry(sid_of_logged_on_user=''):
+    if sid_of_logged_on_user != '':
+        start_reg_path = 'HKU\\{}'.format(sid_of_logged_on_user)
+    else:
+        start_reg_path = ''
+    start_delete_command = 'reg delete '
+    end_delete_command = ' /f'
     keys_list = get_paths_to_delete('keys-to-delete.txt')
-    for i in range(len(keys_list)):
-        if keys_list[i].startswith("HKCU"):
-            keys_list[i] = keys_list[i].replace("HKCU", start_reg_path)
-        print("Deleting {}".format(keys_list[i]))
-        os.system(
+    for key in keys_list:
+        if key.startswith('HKCU') and start_reg_path != '':
+            key = key.replace('HKCU', start_reg_path)
+        logger.debug('Deleting {}'.format(key))
+        logger.info(subprocess.run(
             start_delete_command +
-            '"' + keys_list[i] + '"' +
-            end_delete_command
-        )
+            '"' + key + '"' +
+            end_delete_command,
+            capture_output=True
+        ))
 
 
 def uninstall_anyconnect():
@@ -67,10 +89,21 @@ def uninstall_anyconnect():
     executable_path = get_resource_path(
         'PurgeNotifyObjects.exe', 'executable'
     )
-    os.system(executable_path + ' -confirmDelete')
+    logger.info('Running PurgeNotifyObjects.exe')
+    try:
+        logger.info(subprocess.run(
+            executable_path + ' -confirmDelete',  capture_output=True
+        ))
+    except WindowsError as err:
+        logger.warning(err)
+        pass
+    logger.info('Getting logged on user info')
     logged_on_user = get_logged_on_user()
     sid_of_logged_on_user = get_sid_of_logged_on_user(logged_on_user)
-    print("Logged on user: {}. Sid: {}".format(logged_on_user,
-                                               sid_of_logged_on_user))
+    logger.info('Logged on user: {}. Sid: {}'.format(
+        logged_on_user,
+        sid_of_logged_on_user
+        ))
     clear_trash(logged_on_user)
     clear_registry(sid_of_logged_on_user)
+    logger.info('All operations completed')
