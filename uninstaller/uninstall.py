@@ -1,4 +1,5 @@
 import subprocess
+import os
 
 from uninstaller.getsystemdata import (
     get_logged_on_user, get_sid_of_logged_on_user, get_uninstall_strings_list
@@ -39,7 +40,7 @@ def run_uninstall_commands(remove_commands_list):
 
 def clear_trash(logged_on_user):
     path_list = get_paths_to_delete('paths-to-delete.txt')
-    delete_command = "rmdir /s /q "
+    start_delete_command = 'rmdir /s /q '
     for i in range(len(path_list)):
         if path_list[i].startswith(r"%userprofile%"):
             if logged_on_user != '':
@@ -49,16 +50,14 @@ def clear_trash(logged_on_user):
                             )
             else:
                 path_list.pop[i]
-    for i in range(len(path_list)):
-        logger.info('Deleting {}'.format(path_list[i]))
+    for path in path_list:
+        delete_command = start_delete_command + '"' + path + '"'
+        logger.info('{}'.format(delete_command))
         try:
-            logger.info(subprocess.run(
-                delete_command + '"' + path_list[i] + '"',
-                capture_output=True
-            ))
+            os.system(delete_command)
         except WindowsError as err:
             logger.warning('Unable to delete {}. {}'.format(
-                path_list[i], err
+                path, err
             ))
             pass
 
