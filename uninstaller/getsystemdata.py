@@ -147,6 +147,10 @@ def make_reg_paths_list_to_remove(unfiltered_keys_list):
         'Installer\\UserData\\S-1-5-18\\Products',
         levels_to_up=1
     ))
+    if keys_list != []:
+        logger.warning('Bad anyconnect installation detected!')
+    else:
+        logger.info('The program uninstalled the product correctly')
     keys_list.extend(get_product_reg_paths_list('HKCR\\Installer\\Products'))
     keys_list.extend(get_product_reg_paths_list(
         'HKLM\\SOFTWARE\\Classes\\Installer\\Products'
@@ -155,10 +159,7 @@ def make_reg_paths_list_to_remove(unfiltered_keys_list):
         'HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\'
         'CurrentVersion\\Uninstall'
     ))
-    if keys_list != []:
-        logger.warning('Bad installation detected!')
-    else:
-        logger.info('The program uninstalled the product correctly')
+
     HKU_root_paths = filter_HKU_sids(get_reg_paths(
         make_list_from_cmd_output('reg query HKU', '\r\n')
     ))
