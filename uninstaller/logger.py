@@ -6,7 +6,7 @@ _log_format = '[(%(levelname)s)-%(asctime)s-%(name)s]: %(message)s'
 
 
 def get_file_handler():
-    log_file = os.environ['TEMP'] + '\\anyconnect-uninstaller.log'
+    log_file = os.environ['windir'] + '\\Temp\\anyconnect-uninstaller.log'
     file_handler = logging.FileHandler(log_file)
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(logging.Formatter(_log_format))

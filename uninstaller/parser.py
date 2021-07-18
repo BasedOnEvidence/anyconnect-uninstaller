@@ -1,5 +1,6 @@
 from uninstaller.constants import MODULE_NAMES_LIST
 from uninstaller.logger import get_logger
+import os
 
 
 logger = get_logger(__name__)
@@ -13,11 +14,25 @@ def get_reg_paths(list):
     return reg_paths
 
 
+def filter_HKU_sids(reg_paths_list):
+    filtered_reg_paths_list = []
+    for reg_path in reg_paths_list:
+        _, sid = os.path.split(reg_path)
+        if (
+            (len(sid) > 20) and
+            ('_' not in sid) and
+            ('.' not in sid)
+        ):
+            filtered_reg_paths_list.append(reg_path)
+    return filtered_reg_paths_list
+
+
 def get_module_name(reg_data):
     try:
         for name in MODULE_NAMES_LIST:
             if name in reg_data[-1]:
                 return name
+        return None
     except IndexError as err:
         logger.warning(err)
         pass
@@ -29,7 +44,16 @@ def get_uninstall_string(reg_data):
     try:
         for str in MSIEXEC_LIST:
             if str in reg_data[-1]:
+                if ' /I' in reg_data[-1]:
+                    logger.warning(
+                        'Bad uinstall cmd detected: {}'. format(reg_data[-1])
+                    )
+                    reg_data[-1] = reg_data[-1].replace(' /I', ' /X')
+                    logger.info(
+                        'New uinstall cmd: {}'. format(reg_data[-1])
+                    )
                 return reg_data[-1].rstrip('\r\n')
+        return None
     except IndexError as err:
         logger.warning(err)
         pass

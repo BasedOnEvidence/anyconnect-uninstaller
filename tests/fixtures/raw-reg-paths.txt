@@ -1,0 +1,27 @@
+
+HKEY_LOCAL_MACHINE\804CCF31B0990624C87DCD25F07F44EB\InstallProperties
+    Comments    REG_SZ    A SmartNET contract is required for support -  Cisco AnyConnect ISE Posture Module.
+    InstallLocation    REG_SZ    C:\Program Files (x86)\Cisco\Cisco AnyConnect Secure Mobility Client\
+    DisplayName    REG_SZ    Cisco AnyConnect ISE Posture Module
+
+HKEY_LOCAL_MACHINE\9B1783E08C081B245939C525BE1227AF\InstallProperties
+    Comments    REG_SZ    A SmartNET contract is required for support -  Cisco AnyConnect ISE Compliance Module.
+    InstallLocation    REG_SZ    C:\Program Files (x86)\Cisco\Cisco AnyConnect Secure Mobility Client\opswat\
+    DisplayName    REG_SZ    Cisco AnyConnect ISE Compliance Module
+
+HKEY_LOCAL_MACHINE\A2F9005C5215F9E498AA68083AD26AAA\InstallProperties
+    Comments    REG_SZ    A SmartNET contract is required for support -  Cisco AnyConnect Diagnostics and Reporting Tool.
+    InstallLocation    REG_SZ    C:\Program Files (x86)\Cisco\Cisco AnyConnect Secure Mobility Client\DART\
+    DisplayName    REG_SZ    Cisco AnyConnect Diagnostics and Reporting Tool
+
+HKEY_LOCAL_MACHINE\A8F916041A76B2445829A1EA2F7B1F95\InstallProperties
+    Comments    REG_SZ    A SmartNET contract is required for support - Cisco AnyConnect Network Access Manager.
+    InstallLocation    REG_SZ    C:\Program Files (x86)\Cisco\Cisco AnyConnect Secure Mobility Client\
+    DisplayName    REG_SZ    Cisco AnyConnect Network Access Manager
+
+HKEY_LOCAL_MACHINE\BBED51B69BA2DD24E8FC28FEF812CC96\InstallProperties
+    Comments    REG_SZ    A SmartNET contract is required for support - Cisco AnyConnect Secure Mobility Client.
+    InstallLocation    REG_SZ    C:\Program Files (x86)\Cisco\Cisco AnyConnect Secure Mobility Client\
+    DisplayName    REG_SZ    Cisco AnyConnect Secure Mobility Client
+
+End of search: 15 match(es) found.

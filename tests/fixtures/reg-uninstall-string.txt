@@ -1,0 +1,4 @@
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products\BBED51B69BA2DD24E8FC28FEF812CC96\InstallProperties
+    UninstallString    REG_EXPAND_SZ    MsiExec.exe /I{6B15DEBB-2AB9-1111-8ECF-82EF8F21CC69}
+

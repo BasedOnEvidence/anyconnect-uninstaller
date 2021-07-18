@@ -1,3 +1,5 @@
+import os
+
 from uninstaller.logger import get_logger
 from uninstaller.cmdhandler import make_list_from_cmd_output
 from uninstaller.parser import (
@@ -5,11 +7,12 @@ from uninstaller.parser import (
     get_reg_paths,
     get_uninstall_string,
     get_active_username,
-    get_sid_of_user
+    get_sid_of_user,
+    filter_HKU_sids
 )
 from uninstaller.constants import SMC_MODULE_NAME
 
-ISTALLATION_INFO_PATH_LIST = [
+ISTALLATION_INFO_PATHS_LIST = [
     ('HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\'
      'Installer\\UserData\\S-1-5-18\\Products'),
     'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
@@ -24,30 +27,53 @@ SEARCHSTR = 'Anyconnect'
 logger = get_logger(__name__)
 
 
-def get_uninstall_data():
+def get_product_reg_paths_list(root_path, levels_to_up=0):
+    paths_list = []
+    search_cmd = (
+        'reg query "' + root_path + '" /f ' + SEARCHSTR + ' /s /d'
+    )
+    paths_list.extend(get_reg_paths(
+        make_list_from_cmd_output(search_cmd, '\r\n')
+    ))
+    for _ in range(levels_to_up):
+        for cur_path in paths_list:
+            cur_path, _ = os.path.split(cur_path)
+            cur_path = cur_path.lstrip('\\')
+    if paths_list != []:
+        logger.info('Product''s reg paths found:\n{}'.format(
+            '\n'.join(paths_list)
+        ))
+    else:
+        logger.info('No product''s reg paths in {}'.format(
+            root_path
+        ))
+    return paths_list
+
+
+def get_uninstall_data(uninstall_paths_list):
     uninstall_data = {}
-    for global_path in ISTALLATION_INFO_PATH_LIST:
-        search_cmd = (
-            'reg query "' + global_path + '" /f ' + SEARCHSTR + ' /s /d'
+    uniq_uninstall_strings = []
+    for path in uninstall_paths_list:
+        get_name_cmd = 'reg query "' + path + '" /v DisplayName'
+        get_uninst_cmd = 'reg query "' + path + '" /v UninstallString'
+        module_name = get_module_name(
+            make_list_from_cmd_output(get_name_cmd, '  ')
         )
-        paths_list = get_reg_paths(
-            make_list_from_cmd_output(search_cmd, '\r\n')
+        uninstall_string = get_uninstall_string(
+            make_list_from_cmd_output(get_uninst_cmd, '  ')
         )
-        for path in paths_list:
-            get_name_cmd = 'reg query "' + path + '" /v DisplayName'
-            get_uninst_cmd = 'reg query "' + path + '" /v UninstallString'
-            module_name = get_module_name(
-                make_list_from_cmd_output(get_name_cmd, '  ')
+        if (
+            module_name and uninstall_string and
+            uninstall_string not in uniq_uninstall_strings
+        ):
+            uniq_uninstall_strings.append(uninstall_string)
+            uninstall_data[path] = [module_name, uninstall_string]
+            logger.info(
+                'Path {} with module name {} '
+                'and uninstall cmd {} added to data'.format(
+                    path, module_name, uninstall_string
+                )
             )
-            uninstall_string = get_uninstall_string(
-                make_list_from_cmd_output(get_uninst_cmd, '  ')
-            )
-            if module_name and uninstall_string:
-                if uninstall_string not in [
-                    uninstall_data[key][1] for key in uninstall_data
-                ]:
-                    uninstall_data[path] = [module_name, uninstall_string]
-                    logger.info('Path {} added to data'.format(path))
     return uninstall_data
 
 
@@ -88,9 +114,12 @@ def get_sid_of_logged_on_user(logged_on_user):
     return sid_of_logged_on_user
 
 
-def get_uninstall_strings_list():
-    uninstall_strings_list = []
-    data = get_uninstall_data()
+def get_reg_uninstall_info():
+    uninstall_commands_list = []
+    uninstall_paths_list = []
+    for root_path in ISTALLATION_INFO_PATHS_LIST:
+        uninstall_paths_list.extend(get_product_reg_paths_list(root_path))
+    data = get_uninstall_data(uninstall_paths_list)
     is_SMC_exist = False
     for key in data:
         uninstall_string = data[key][1] + ' /qn /norestart'
@@ -99,13 +128,48 @@ def get_uninstall_strings_list():
             is_SMC_exist = True
             SMC_uninstall_string = uninstall_string
         else:
-            uninstall_strings_list.append(uninstall_string)
+            uninstall_commands_list.append(uninstall_string)
             logger.info('Uninstall command {} added to uninstall list'.format(
                 uninstall_string
             ))
     if is_SMC_exist:
-        uninstall_strings_list.append(SMC_uninstall_string)
+        uninstall_commands_list.append(SMC_uninstall_string)
         logger.info('Uninstall command {} added to uninstall list'.format(
             SMC_uninstall_string
         ))
-    return uninstall_strings_list
+    return uninstall_commands_list
+
+
+def make_reg_paths_list_to_remove(unfiltered_keys_list):
+    keys_list = []
+    keys_list.extend(get_product_reg_paths_list(
+        'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\'
+        'Installer\\UserData\\S-1-5-18\\Products',
+        levels_to_up=1
+    ))
+    keys_list.extend(get_product_reg_paths_list('HKCR\\Installer\\Products'))
+    keys_list.extend(get_product_reg_paths_list(
+        'HKLM\\SOFTWARE\\Classes\\Installer\\Products'
+    ))
+    keys_list.extend(get_product_reg_paths_list(
+        'HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\'
+        'CurrentVersion\\Uninstall'
+    ))
+    if keys_list != []:
+        logger.warning('Bad installation detected!')
+    else:
+        logger.info('The program uninstalled the product correctly')
+    HKU_root_paths = filter_HKU_sids(get_reg_paths(
+        make_list_from_cmd_output('reg query HKU', '\r\n')
+    ))
+    for reg_path in unfiltered_keys_list:
+        if reg_path.startswith('HKCU'):
+            for sid_path in HKU_root_paths:
+                new_reg_path = reg_path.replace('HKCU', sid_path)
+                logger.info('Reg path {} converted to {}'.format(
+                    reg_path, new_reg_path
+                ))
+                keys_list.append(new_reg_path)
+        else:
+            keys_list.append(reg_path)
+    return keys_list

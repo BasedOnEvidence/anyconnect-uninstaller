@@ -1,0 +1,4 @@
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products\BBED51B69BA2DD24E8FC28FEF812CC96\InstallProperties
+    DisplayName    REG_SZ    Cisco AnyConnect Secure Mobility Client
+
