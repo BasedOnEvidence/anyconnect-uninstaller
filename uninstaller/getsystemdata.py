@@ -36,9 +36,10 @@ def get_product_reg_paths_list(root_path, levels_to_up=0):
         make_list_from_cmd_output(search_cmd, '\r\n')
     ))
     for _ in range(levels_to_up):
-        for cur_path in paths_list:
-            cur_path, _ = os.path.split(cur_path)
-            cur_path = cur_path.lstrip('\\')
+        for path_index in range(len(paths_list)):
+            new_path, _ = os.path.split(paths_list[path_index])
+            new_path = new_path.lstrip('\\')
+            paths_list[path_index] = new_path
     if paths_list != []:
         logger.info('Product''s reg paths found:\n{}'.format(
             '\n'.join(paths_list)

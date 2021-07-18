@@ -21,6 +21,27 @@ HKLM\SOFTWARE\Classes\WOW6432Node\CLSID\{C15C0F4F-DDFB-4591-AD53-C9A71C9C15C0}
 HKLM\SOFTWARE\Classes\WOW6432Node\AppID\{C15C0F4F-DDFB-4591-AD53-C9A71C9C15C0}
 HKLM\SOFTWARE\Classes\WOW6432Node\TypeLib\{C15C09AE-FCCE-9221-FFA2-7465FEAAE55A}
 HKLM\SOFTWARE\Classes\WOW6432Node\TypeLib\{E566567C-5D39-4FFA-82DA-CE1AE9FE7737}
+HKLM\SOFTWARE\WOW6432Node\Classes\CLSID\{548A1F06-AECE-4506-8ABB-5E3D3A99B67B}
+HKLM\SOFTWARE\WOW6432Node\Classes\CLSID\{C15C0F4F-DDFB-4591-AD53-C9A71C9C15C0}
+HKLM\SOFTWARE\WOW6432Node\Classes\AppID\{C15C0F4F-DDFB-4591-AD53-C9A71C9C15C0}
+HKLM\SOFTWARE\WOW6432Node\Classes\TypeLib\{C15C09AE-FCCE-9221-FFA2-7465FEAAE55A}
+HKLM\SOFTWARE\WOW6432Node\Classes\TypeLib\{E566567C-5D39-4FFA-82DA-CE1AE9FE7737}
+HKLM\SOFTWARE\Cisco\Cisco AnyConnect Network Access Manager
+HKLM\SOFTWARE\Classes\Cisco.AnyConnect.VpnApi
+HKLM\SOFTWARE\Classes\Cisco.AnyConnect.VpnApi.1
+HKLM\SOFTWARE\WOW6432Node\Cisco\Cisco AnyConnect Diagnostics and Reporting Tool
+HKLM\SOFTWARE\WOW6432Node\Cisco\Cisco AnyConnect Secure Mobility Client
+HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Cisco AnyConnect Secure Mobility Client
+HKLM\SYSTEM\ControlSet001\Services\EventLog\Cisco AnyConnect Diagnostics and Reporting Tool
+HKLM\SYSTEM\ControlSet001\Services\EventLog\Cisco AnyConnect ISE Posture Module
+HKLM\SYSTEM\ControlSet001\Services\EventLog\Cisco AnyConnect Network Access Manager
+HKLM\SYSTEM\ControlSet001\Services\EventLog\Cisco AnyConnect Posture Module
+HKLM\SYSTEM\ControlSet001\Services\EventLog\Cisco AnyConnect Secure Mobility Client
+HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Cisco AnyConnect Diagnostics and Reporting Tool
+HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Cisco AnyConnect ISE Posture Module
+HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Cisco AnyConnect Network Access Manager
+HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Cisco AnyConnect Posture Module
+HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Cisco AnyConnect Secure Mobility Client
 HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\028FD7E57CB8F7645BD85F0CBF8EBCEC
 HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\02E042D6EEE9FA64FA73FC37DE8A297B
 HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\031C8F6947D09C0449AD651655B46663
@@ -258,41 +279,6 @@ HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Compo
 HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\FBF1DBABD7033134182A18DD74595519
 HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\FC96E855E4D9EE147B153550DB21FB95
 HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\FEA184EC1F2C39C4FBB1D620F5F48FFF
-HKLM\SOFTWARE\WOW6432Node\Classes\CLSID\{548A1F06-AECE-4506-8ABB-5E3D3A99B67B}
-HKLM\SOFTWARE\WOW6432Node\Classes\CLSID\{C15C0F4F-DDFB-4591-AD53-C9A71C9C15C0}
-HKLM\SOFTWARE\WOW6432Node\Classes\AppID\{C15C0F4F-DDFB-4591-AD53-C9A71C9C15C0}
-HKLM\SOFTWARE\WOW6432Node\Classes\TypeLib\{C15C09AE-FCCE-9221-FFA2-7465FEAAE55A}
-HKLM\SOFTWARE\WOW6432Node\Classes\TypeLib\{E566567C-5D39-4FFA-82DA-CE1AE9FE7737}
-HKLM\SYSTEM\ControlSet001\Services\aciseagent
-HKLM\SYSTEM\ControlSet001\Services\acnamfd
-HKLM\SYSTEM\ControlSet001\Services\acsock
-HKLM\SYSTEM\ControlSet001\Services\nam
-HKLM\SYSTEM\ControlSet001\Services\namlm
-HKLM\SYSTEM\ControlSet001\Services\vpnagent
-HKLM\SYSTEM\ControlSet001\Services\vpnva
-HKLM\SYSTEM\CurrentControlSet\Services\aciseagent
-HKLM\SYSTEM\CurrentControlSet\Services\acnamfd
-HKLM\SYSTEM\CurrentControlSet\Services\acsock
-HKLM\SYSTEM\CurrentControlSet\Services\nam
-HKLM\SYSTEM\CurrentControlSet\Services\namlm
-HKLM\SYSTEM\CurrentControlSet\Services\vpnagent
-HKLM\SYSTEM\CurrentControlSet\Services\vpnva
-HKLM\SOFTWARE\Cisco\Cisco AnyConnect Network Access Manager
-HKLM\SOFTWARE\Classes\Cisco.AnyConnect.VpnApi
-HKLM\SOFTWARE\Classes\Cisco.AnyConnect.VpnApi.1
-HKLM\SOFTWARE\WOW6432Node\Cisco\Cisco AnyConnect Diagnostics and Reporting Tool
-HKLM\SOFTWARE\WOW6432Node\Cisco\Cisco AnyConnect Secure Mobility Client
-HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Cisco AnyConnect Secure Mobility Client
-HKLM\SYSTEM\ControlSet001\Services\EventLog\Cisco AnyConnect Diagnostics and Reporting Tool
-HKLM\SYSTEM\ControlSet001\Services\EventLog\Cisco AnyConnect ISE Posture Module
-HKLM\SYSTEM\ControlSet001\Services\EventLog\Cisco AnyConnect Network Access Manager
-HKLM\SYSTEM\ControlSet001\Services\EventLog\Cisco AnyConnect Posture Module
-HKLM\SYSTEM\ControlSet001\Services\EventLog\Cisco AnyConnect Secure Mobility Client
-HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Cisco AnyConnect Diagnostics and Reporting Tool
-HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Cisco AnyConnect ISE Posture Module
-HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Cisco AnyConnect Network Access Manager
-HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Cisco AnyConnect Posture Module
-HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Cisco AnyConnect Secure Mobility Client
 HKCU\AppEvents\EventLabels\ACNAMConnected
 HKCU\AppEvents\EventLabels\ACNAMCredentialRequest
 HKCU\AppEvents\EventLabels\ACVPNConnected

@@ -1,7 +1,7 @@
 %userprofile%\.cisco
 %userprofile%\AppData\Local\Cisco\Cisco AnyConnect Secure Mobility Client
-C:\ProgramData\Cisco\Cisco AnyConnect Secure Mobility Client
-C:\ProgramData\Cisco\Cisco AnyConnect VPN Client
+%allusersprofile%\Cisco\Cisco AnyConnect Secure Mobility Client
+%allusersprofile%\Cisco\Cisco AnyConnect VPN Client
 %programfiles(x86)%\Cisco\Cisco AnyConnect Secure Mobility Client
 %programfiles%\Cisco\Cisco AnyConnect Secure Mobility Client
 %windir%\SysWOW64\config\systemprofile\AppData\Local\Cisco\Cisco AnyConnect Secure Mobility Client
