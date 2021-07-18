@@ -41,11 +41,11 @@ def get_product_reg_paths_list(root_path, levels_to_up=0):
             new_path = new_path.lstrip('\\')
             paths_list[path_index] = new_path
     if paths_list != []:
-        logger.info('Product''s reg paths found:\n{}'.format(
+        logger.info('Product reg paths found:\n{}'.format(
             '\n'.join(paths_list)
         ))
     else:
-        logger.info('No product''s reg paths in {}'.format(
+        logger.info('No product reg paths in {}'.format(
             root_path
         ))
     return paths_list
