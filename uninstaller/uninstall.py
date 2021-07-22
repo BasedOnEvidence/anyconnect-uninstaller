@@ -5,7 +5,8 @@ from uninstaller.getsystemdata import (
     get_logged_on_user,
     get_sid_of_logged_on_user,
     get_reg_uninstall_info,
-    make_reg_paths_list_to_remove
+    make_reg_paths_list_to_remove,
+    make_paths_list_to_remove
 )
 from uninstaller.loader import get_paths_to_delete, get_resource_path
 from uninstaller.logger import get_logger
@@ -29,18 +30,11 @@ def run_uninstall_commands(remove_commands_list):
         logger.info(subprocess.run(cmd,  capture_output=True))
 
 
-def clear_trash(logged_on_user):
-    path_list = get_paths_to_delete('paths-to-delete.txt')
+def clear_trash():
+    path_list = make_paths_list_to_remove(
+        get_paths_to_delete('paths-to-delete.txt')
+    )
     start_delete_command = 'rmdir /s /q '
-    for i in range(len(path_list)):
-        if path_list[i].startswith(r"%userprofile%"):
-            if logged_on_user != '':
-                path_list[i] = path_list[i].replace(
-                            r"%userprofile%",
-                            'C:\\users\\{}'.format(logged_on_user)
-                            )
-            else:
-                path_list.pop[i]
     for path in path_list:
         delete_command = start_delete_command + '"' + path + '"'
         logger.info('{}'.format(delete_command))
@@ -60,7 +54,6 @@ def clear_registry():
         get_paths_to_delete('keys-to-delete.txt')
     )
     for key in keys_list:
-        logger.debug('Deleting {}'.format(key))
         logger.info(subprocess.run(
             start_delete_command +
             '"' + key + '"' +
@@ -91,6 +84,6 @@ def uninstall_anyconnect():
         logged_on_user,
         sid_of_logged_on_user
         ))
-    clear_trash(logged_on_user)
+    clear_trash()
     clear_registry()
     logger.info('All operations completed')

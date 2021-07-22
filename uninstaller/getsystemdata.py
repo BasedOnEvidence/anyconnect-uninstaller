@@ -8,7 +8,8 @@ from uninstaller.parser import (
     get_uninstall_string,
     get_active_username,
     get_sid_of_user,
-    filter_HKU_sids
+    filter_HKU_sids,
+    get_profile_path
 )
 from uninstaller.constants import SMC_MODULE_NAME
 
@@ -141,6 +142,19 @@ def get_reg_uninstall_info():
     return uninstall_commands_list
 
 
+def get_system_sids():
+    return filter_HKU_sids(get_reg_paths(
+        make_list_from_cmd_output('reg query HKU', '\r\n')
+    ))
+
+
+def get_user_profile_path(sid):
+    get_profiles_path_cmd = (
+        'reg query "{}\\{}" /v ProfileImagePath'.format(PROFILES_PATH, sid)
+    )
+    return get_profile_path(make_list_from_cmd_output(get_profiles_path_cmd))
+
+
 def make_reg_paths_list_to_remove(unfiltered_keys_list):
     keys_list = []
     keys_list.extend(get_product_reg_paths_list(
@@ -160,18 +174,40 @@ def make_reg_paths_list_to_remove(unfiltered_keys_list):
         'HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\'
         'CurrentVersion\\Uninstall'
     ))
-
-    HKU_root_paths = filter_HKU_sids(get_reg_paths(
-        make_list_from_cmd_output('reg query HKU', '\r\n')
-    ))
+    sids_list = get_system_sids()
     for reg_path in unfiltered_keys_list:
         if reg_path.startswith('HKCU'):
-            for sid_path in HKU_root_paths:
-                new_reg_path = reg_path.replace('HKCU', sid_path)
-                logger.info('Reg path {} converted to {}'.format(
-                    reg_path, new_reg_path
-                ))
+            for sid in sids_list:
+                new_reg_path = reg_path.replace('HKCU', 'HKU\\' + sid)
                 keys_list.append(new_reg_path)
+                logger.info(
+                    'Reg path {} converted to {} and added to rm list'.format(
+                        reg_path, new_reg_path
+                    )
+                )
         else:
             keys_list.append(reg_path)
     return keys_list
+
+
+def make_paths_list_to_remove(unfiltered_paths_list):
+    paths_list = []
+    sids_list = get_system_sids()
+    logger.info('Sids:\n{}'.format('\n'.join(sids_list)))
+    for path in unfiltered_paths_list:
+        if path.startswith(r"%userprofile%"):
+            for sid in sids_list:
+                user_profile_path = get_user_profile_path(sid)
+                if user_profile_path:
+                    new_path = path.replace(
+                        r"%userprofile%", user_profile_path
+                    )
+                    paths_list.append(new_path)
+                    logger.info(
+                        'Path {} converted to {} and added to rm list'.format(
+                            path, new_path
+                        )
+                    )
+        else:
+            paths_list.append(path)
+    return paths_list

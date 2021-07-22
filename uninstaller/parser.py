@@ -15,7 +15,7 @@ def get_reg_paths(list):
 
 
 def filter_HKU_sids(reg_paths_list):
-    filtered_reg_paths_list = []
+    HKU_sids = []
     for reg_path in reg_paths_list:
         _, sid = os.path.split(reg_path)
         if (
@@ -23,8 +23,20 @@ def filter_HKU_sids(reg_paths_list):
             ('_' not in sid) and
             ('.' not in sid)
         ):
-            filtered_reg_paths_list.append(reg_path)
-    return filtered_reg_paths_list
+            HKU_sids.append(sid)
+    return HKU_sids
+
+
+def get_profile_path(reg_data):
+    try:
+        if 'sers\\' in reg_data[-1]:
+            return reg_data[-1]
+        else:
+            logger.warning('No profile path in {}'. format(reg_data))
+            return None
+    except IndexError:
+        pass
+    return None
 
 
 def get_module_name(reg_data):
@@ -46,11 +58,11 @@ def get_uninstall_string(reg_data):
             if str in reg_data[-1]:
                 if ' /I' in reg_data[-1]:
                     logger.warning(
-                        'Bad uinstall cmd detected: {}'. format(reg_data[-1])
+                        'Bad uninstall cmd detected: {}'. format(reg_data[-1])
                     )
                     reg_data[-1] = reg_data[-1].replace(' /I', ' /X')
                     logger.info(
-                        'New uinstall cmd: {}'. format(reg_data[-1])
+                        'New uninstall cmd: {}'. format(reg_data[-1])
                     )
                 return reg_data[-1].rstrip('\r\n')
         return None
