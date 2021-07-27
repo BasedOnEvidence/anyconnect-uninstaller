@@ -34,7 +34,8 @@ def get_profile_path(reg_data):
         else:
             logger.warning('No profile path in {}'. format(reg_data))
             return None
-    except IndexError:
+    except IndexError as err:
+        logger.warning(err)
         pass
     return None
 
