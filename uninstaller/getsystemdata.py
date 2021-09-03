@@ -6,12 +6,10 @@ from uninstaller.parser import (
     get_module_name,
     get_reg_paths,
     get_uninstall_string,
-    get_active_username,
-    get_sid_of_user,
     filter_HKU_sids,
     get_profile_path
 )
-from uninstaller.constants import SMC_MODULE_NAME
+from uninstaller.constants import SMC_MODULE_NAME, MODULE_NAMES_LIST
 
 ISTALLATION_INFO_PATHS_LIST = [
     ('HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\'
@@ -23,32 +21,32 @@ ISTALLATION_INFO_PATHS_LIST = [
 ]
 PROFILES_PATH = ('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\'
                  'CurrentVersion\\ProfileList')
-SEARCHSTR = 'Anyconnect'
 
 logger = get_logger(__name__)
 
 
 def get_product_reg_paths_list(root_path, levels_to_up=0):
     paths_list = []
-    search_cmd = (
-        'reg query "' + root_path + '" /f ' + SEARCHSTR + ' /s /d'
-    )
-    paths_list.extend(get_reg_paths(
-        make_list_from_cmd_output(search_cmd, '\r\n')
-    ))
-    for _ in range(levels_to_up):
-        for path_index in range(len(paths_list)):
-            new_path, _ = os.path.split(paths_list[path_index])
-            new_path = new_path.lstrip('\\')
-            paths_list[path_index] = new_path
-    if paths_list != []:
-        logger.info('Product reg paths found:\n{}'.format(
-            '\n'.join(paths_list)
+    for search_str in MODULE_NAMES_LIST:
+        search_cmd = (
+            'reg query "' + root_path + '" /f "' + search_str + '" /s /d'
+        )
+        paths_list.extend(get_reg_paths(
+            make_list_from_cmd_output(search_cmd, '\r\n')
         ))
-    else:
-        logger.info('No product reg paths in {}'.format(
-            root_path
-        ))
+        for _ in range(levels_to_up):
+            for path_index in range(len(paths_list)):
+                new_path, _ = os.path.split(paths_list[path_index])
+                new_path = new_path.lstrip('\\')
+                paths_list[path_index] = new_path
+        if paths_list != []:
+            logger.info('Product reg paths found:\n{}'.format(
+                '\n'.join(paths_list)
+            ))
+        else:
+            logger.info('No product reg paths in {}'.format(
+                root_path
+            ))
     return paths_list
 
 
@@ -77,43 +75,6 @@ def get_uninstall_data(uninstall_paths_list):
                 )
             )
     return uninstall_data
-
-
-def get_logged_on_user():
-    try:
-        qwinsta_data = make_list_from_cmd_output('qwinsta')
-        logged_on_user = get_active_username(qwinsta_data)
-    except WindowsError as err:
-        logger.warning(
-            'Unable to get username of logged on user!. {}'.format(err)
-        )
-        logged_on_user = ''
-        pass
-    return logged_on_user
-
-
-def get_sid_of_logged_on_user(logged_on_user):
-    if logged_on_user == '':
-        return ''
-    get_profiles_path_list_cmd = 'reg query "' + PROFILES_PATH + '"'
-    raw_data = make_list_from_cmd_output(get_profiles_path_list_cmd, '\r\n')
-    paths_list = get_reg_paths(raw_data)
-    paths_list.pop(0)  # Delete root path from this list
-    try:
-        for path in paths_list:
-            current_key_list = make_list_from_cmd_output(
-                'reg query \"{}\" /v ProfileImagePath '.format(path), '\r\n'
-            )
-            sid_of_logged_on_user = get_sid_of_user(
-                current_key_list, path, logged_on_user
-            )
-            if sid_of_logged_on_user != '':
-                break
-    except WindowsError as err:
-        logger.warning('Unable to get sid of logged on user!. {}'.format(err))
-        sid_of_logged_on_user = ''
-        pass
-    return sid_of_logged_on_user
 
 
 def get_reg_uninstall_info():

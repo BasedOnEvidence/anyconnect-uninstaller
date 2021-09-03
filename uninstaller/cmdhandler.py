@@ -1,5 +1,4 @@
 import subprocess
-import sys
 
 from uninstaller.logger import get_logger
 
@@ -8,7 +7,9 @@ logger = get_logger(__name__)
 
 def make_list_from_cmd_output(command, splitter=None):
     try:
-        out_str = subprocess.check_output(command).decode(sys.stdout.encoding)
+        command = 'chcp 65001 | ' + command
+        logger.info('Running: {}'.format(command))
+        out_str = subprocess.check_output(command, shell=True).decode('utf-8')
         result_list = out_str.split(splitter)
     except (subprocess.CalledProcessError, WindowsError) as err:
         result_list = []

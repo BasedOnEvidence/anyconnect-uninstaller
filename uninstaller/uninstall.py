@@ -2,8 +2,6 @@ import subprocess
 import os
 
 from uninstaller.getsystemdata import (
-    get_logged_on_user,
-    get_sid_of_logged_on_user,
     get_reg_uninstall_info,
     make_reg_paths_list_to_remove,
     make_paths_list_to_remove
@@ -77,13 +75,6 @@ def uninstall_anyconnect():
     except WindowsError as err:
         logger.warning(err)
         pass
-    logger.info('Getting logged on user info')
-    logged_on_user = get_logged_on_user()
-    sid_of_logged_on_user = get_sid_of_logged_on_user(logged_on_user)
-    logger.info('Logged on user: {}. Sid: {}'.format(
-        logged_on_user,
-        sid_of_logged_on_user
-        ))
     clear_trash()
     clear_registry()
     logger.info('All operations completed')
