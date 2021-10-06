@@ -45,6 +45,40 @@ def clear_trash():
             pass
 
 
+def apply_acnamfd_patch():
+    executable_path = get_resource_path(
+        'PurgeNotifyObjects.exe', 'executable'
+    )
+    logger.info('Running PurgeNotifyObjects.exe')
+    try:
+        logger.info(subprocess.run(
+            executable_path + ' -confirmDelete',  capture_output=True
+        ))
+    except WindowsError as err:
+        logger.warning(err)
+        pass
+
+
+def apply_klcp_patch():
+    error_level = subprocess.run(
+        ('reg query "HKLM\\SOFTWARE\\Microsoft\\'
+         'Windows\\CurrentVersion\\Authentication\\'
+         'Credential Providers\\{F4B501AA-12AC-422B-889E-4480630419EE}"'),
+        capture_output=True
+    ).returncode
+    if error_level == 0:
+        logger.info('KLCP detected. Applying KLCP patch.')
+        logger.info(subprocess.run(
+            ('reg add "HKLM\\SOFTWARE\\Microsoft\\Windows\\'
+             'CurrentVersion\\Authentication\\Credential Providers\\'
+             '{B12744B8-5BB7-463a-B85E-BB7627E73002}\\'
+             'Wrap\\{F4B501AA-12AC-422B-889E-4480630419EE}" '
+             '/ve /t REG_EXPAND_SZ /d '
+             '"%SystemRoot%\\System32\\klcp.dll" /f'),
+            capture_output=True)
+        )
+
+
 def clear_registry():
     start_delete_command = 'reg delete '
     end_delete_command = ' /f'
@@ -64,17 +98,8 @@ def uninstall_anyconnect():
     logger.info('Program started')
     uninstall_commands_list = get_reg_uninstall_info()
     run_uninstall_commands(uninstall_commands_list)
-    executable_path = get_resource_path(
-        'PurgeNotifyObjects.exe', 'executable'
-    )
-    logger.info('Running PurgeNotifyObjects.exe')
-    try:
-        logger.info(subprocess.run(
-            executable_path + ' -confirmDelete',  capture_output=True
-        ))
-    except WindowsError as err:
-        logger.warning(err)
-        pass
+    apply_acnamfd_patch()
     clear_trash()
     clear_registry()
+    apply_klcp_patch()
     logger.info('All operations completed')

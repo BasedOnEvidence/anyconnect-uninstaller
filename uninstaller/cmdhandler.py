@@ -19,4 +19,6 @@ def make_list_from_cmd_output(command, splitter=None):
         pass
     except UnicodeEncodeError as err:
         logger.error(err)
+    except Exception as err:
+        logger.error(err)
     return result_list
