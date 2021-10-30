@@ -4,8 +4,8 @@
 <p align="center">
   <a href="#descrition">Description</a> •
   <a href="#key-features">Key Features</a> •
-  <a href="#how-to-use">How To Use</a> •
   <a href="#download">Download</a> •
+  <a href="#how-to-use">How To Use</a> •
   <a href="#credits">Credits</a> •
   <a href="#license">License</a>
 </p>
@@ -13,7 +13,7 @@
 
 ## Descrition
 
-Program for removing cisco anyconnect. Helps to remove bad installations and to update client.
+Program for removing cisco anyconnect. Helps to remove bad installations and update client.
 
 ## Key Features
 
