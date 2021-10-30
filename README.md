@@ -1,5 +1,5 @@
 
-<h2 align="center">Cisco anyconnect uninstaller</h2>
+<h2 align="center">Cisco Anyconnect Uninstaller</h2>
 
 <p align="center">
   <a href="#descrition">Description</a> •
@@ -36,8 +36,7 @@ You can use command line interface for silent run.
 
 Optional arguments: <br />
   -h, --help            show this help message and exit <br />
-  -r {yes,no,ask}, --restart {yes,no,ask} <br />
-                        set restart parametr <br />
+  -r {yes,no,ask}, --restart {yes,no,ask} set restart parametr
 
 If you want to build .exe yourself, you'll need [Git](https://git-scm.com) and [Python3](https://www.python.org/downloads/) installed on your computer. From your command line:
 
