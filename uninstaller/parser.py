@@ -1,4 +1,7 @@
-from uninstaller.constants import MODULE_NAMES_LIST
+from uninstaller.constants import (
+    MODULE_NAMES_LIST,
+    ISTALLATION_INFO_PATHS_LIST
+)
 from uninstaller.logger import get_logger
 import os
 
@@ -10,7 +13,15 @@ def get_reg_paths(list):
     reg_paths = []
     for item in list:
         if 'HKEY' in item:
-            reg_paths.append(item)
+            if any(item in path for path in ISTALLATION_INFO_PATHS_LIST):
+                logger.warning(
+                    'Prevented the addition of dangerous path {}'.format(
+                        item
+                    )
+                )
+                continue
+            else:
+                reg_paths.append(item)
     return reg_paths
 
 

@@ -13,3 +13,14 @@ MODULE_NAMES_LIST = [
     SMC_MODULE_NAME,
     DART_MODULE_NAME
 ]
+
+ISTALLATION_INFO_PATHS_LIST = [
+    ('HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\'
+     'Installer\\UserData\\S-1-5-18\\Products'),
+    'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
+    ('HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\'
+     'Windows\\CurrentVersion\\Uninstall'),
+    'HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall'
+]
+PROFILES_PATH = ('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\'
+                 'CurrentVersion\\ProfileList')

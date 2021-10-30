@@ -1,5 +1,3 @@
-import os
-
 from uninstaller.logger import get_logger
 from uninstaller.cmdhandler import make_list_from_cmd_output
 from uninstaller.parser import (
@@ -9,23 +7,19 @@ from uninstaller.parser import (
     filter_HKU_sids,
     get_profile_path
 )
-from uninstaller.constants import SMC_MODULE_NAME, MODULE_NAMES_LIST
+from uninstaller.constants import (
+    SMC_MODULE_NAME,
+    NAM_MODULE_NAME,
+    MODULE_NAMES_LIST,
+    ISTALLATION_INFO_PATHS_LIST,
+    PROFILES_PATH
+)
 
-ISTALLATION_INFO_PATHS_LIST = [
-    ('HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\'
-     'Installer\\UserData\\S-1-5-18\\Products'),
-    'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
-    ('HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\'
-     'Windows\\CurrentVersion\\Uninstall'),
-    'HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall'
-]
-PROFILES_PATH = ('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\'
-                 'CurrentVersion\\ProfileList')
 
 logger = get_logger(__name__)
 
 
-def get_product_reg_paths_list(root_path, levels_to_up=0):
+def get_product_reg_paths_list(root_path):
     paths_list = []
     for search_str in MODULE_NAMES_LIST:
         search_cmd = (
@@ -34,11 +28,6 @@ def get_product_reg_paths_list(root_path, levels_to_up=0):
         paths_list.extend(get_reg_paths(
             make_list_from_cmd_output(search_cmd, '\r\n')
         ))
-        for _ in range(levels_to_up):
-            for path_index in range(len(paths_list)):
-                new_path, _ = os.path.split(paths_list[path_index])
-                new_path = new_path.lstrip('\\')
-                paths_list[path_index] = new_path
         if paths_list != []:
             logger.info('Product reg paths found:\n{}'.format(
                 '\n'.join(paths_list)
@@ -84,12 +73,16 @@ def get_reg_uninstall_info():
         uninstall_paths_list.extend(get_product_reg_paths_list(root_path))
     data = get_uninstall_data(uninstall_paths_list)
     is_SMC_exist = False
+    is_NAM_exist = False
     for key in data:
         uninstall_string = data[key][1] + ' /qn /norestart'
         module_name = data[key][0]
         if module_name == SMC_MODULE_NAME:
             is_SMC_exist = True
             SMC_uninstall_string = uninstall_string
+        elif module_name == NAM_MODULE_NAME:
+            is_NAM_exist = True
+            NAM_uninstall_string = uninstall_string
         else:
             uninstall_commands_list.append(uninstall_string)
             logger.info('Uninstall command {} added to uninstall list'.format(
@@ -97,8 +90,13 @@ def get_reg_uninstall_info():
             ))
     if is_SMC_exist:
         uninstall_commands_list.append(SMC_uninstall_string)
-        logger.info('Uninstall command {} added to uninstall list'.format(
+        logger.info('Uninstall cmd for SMC {} added to uninstall list'.format(
             SMC_uninstall_string
+        ))
+    if is_NAM_exist:
+        uninstall_commands_list.insert(0, NAM_uninstall_string)
+        logger.info('Uninstall cmd for NAM {} added to uninstall list'.format(
+            NAM_uninstall_string
         ))
     return uninstall_commands_list
 
@@ -120,13 +118,12 @@ def make_reg_paths_list_to_remove(unfiltered_keys_list):
     keys_list = []
     keys_list.extend(get_product_reg_paths_list(
         'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\'
-        'Installer\\UserData\\S-1-5-18\\Products',
-        levels_to_up=1
+        'Installer\\UserData\\S-1-5-18\\Products'
     ))
     if keys_list != []:
-        logger.warning('Bad anyconnect installation detected!')
+        logger.warning('Bad anyconnect installation detected!!')
     else:
-        logger.info('The program uninstalled the product correctly')
+        logger.info('The program uninstalled anyconnect correctly!!')
     keys_list.extend(get_product_reg_paths_list('HKCR\\Installer\\Products'))
     keys_list.extend(get_product_reg_paths_list(
         'HKLM\\SOFTWARE\\Classes\\Installer\\Products'
