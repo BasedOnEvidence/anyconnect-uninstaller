@@ -40,18 +40,18 @@ Optional arguments: <br />
 
 If you want to build .exe yourself, you'll need [Git](https://git-scm.com) and [Python3](https://www.python.org/downloads/) installed on your computer. From your command line:
 
-```bash
+```powershell
 # Clone this repository
-$ git clone https://github.com/BasedOnEvidence/anyconnect-uninstaller/
+git clone https://github.com/BasedOnEvidence/anyconnect-uninstaller/
 
 # Go into the repository
-$ cd anyconnect-uninstaller
+cd anyconnect-uninstaller
 
 # Install dependencies
-$ pip install pyinstaller
+pip install pyinstaller
 
 # Build anyconnect-uninstaller.exe
-$ build.bat
+.\build.bat
 ```
 
 ## Credits
