@@ -33,10 +33,11 @@ You can [download](https://github.com/BasedOnEvidence/anyconnect-uninstaller/rel
 
 Just run .exe as administrator. Uninstallation will start immediately.
 You can use command line interface for silent run.
-Optional arguments:
-  -h, --help            show this help message and exit
-  -r {yes,no,ask}, --restart {yes,no,ask}
-                        set restart parametr
+
+Optional arguments: <br />
+  -h, --help            show this help message and exit <br />
+  -r {yes,no,ask}, --restart {yes,no,ask} <br />
+                        set restart parametr <br />
 
 If you want to build .exe yourself, you'll need [Git](https://git-scm.com) and [Python3](https://www.python.org/downloads/) installed on your computer. From your command line:
 
