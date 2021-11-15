@@ -11,7 +11,7 @@
 </p>
 
 
-## Descrition
+## Description
 
 Program for removing cisco anyconnect. Helps to remove bad installations and update client.
 
