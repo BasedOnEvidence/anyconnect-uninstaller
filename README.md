@@ -6,8 +6,7 @@
   <a href="#key-features">Key Features</a> •
   <a href="#download">Download</a> •
   <a href="#how-to-use">How To Use</a> •
-  <a href="#credits">Credits</a> •
-  <a href="#license">License</a>
+  <a href="#build">Build</a>
 </p>
 
 
@@ -27,7 +26,7 @@ Program for removing cisco anyconnect. Helps to remove bad installations and upd
 
 ## Download
 
-You can [download](https://github.com/BasedOnEvidence/anyconnect-uninstaller/releases) the latest installable version of anyconnect uninstaller for Windows
+You can [download](https://github.com/rift0nix/anyconnect-uninstaller/releases) the latest installable version of anyconnect uninstaller for Windows
 
 ## How To Use
 
@@ -38,39 +37,34 @@ Optional arguments: <br />
   -h, --help            show this help message and exit <br />
   -r {yes,no,ask}, --restart {yes,no,ask} set restart parametr
 
-If you want to build .exe yourself, you'll need [Git](https://git-scm.com) and [Python3](https://www.python.org/downloads/) installed on your computer. From your command line:
+Example:
+```powershell
+.\anyconnect-uninstaller-1.2.7.exe  --restart no
+```
+
+## Build
+
+If you want to build .exe yourself, you'll need [Git](https://git-scm.com) and [Python3](https://www.python.org/downloads/) installed on your computer. Fast way to get them:
+
+* Install [chocolatey](https://docs.chocolatey.org/en-us/choco/setup/#install-with-cmd.exe)
+* Install folowing dependencies:
+```powershell
+choco install git.install -y
+choco install python --version=3.10.0 -y
+exit
+```
+
+Now you can build binary
 
 ```powershell
 # Clone this repository
-git clone https://github.com/BasedOnEvidence/anyconnect-uninstaller/
-
+git clone https://github.com/rift0nix/anyconnect-uninstaller/
 # Go into the repository
 cd anyconnect-uninstaller
-
+python -m venv .venv
+.\.venv\scripts\activate
 # Install dependencies
-pip install pyinstaller
-
-# Build anyconnect-uninstaller.exe
+pip install pyinstaller==4.10
+# Build dist\anyconnect-uninstaller.exe
 .\build.bat
 ```
-
-## Credits
-
-This software uses the following open source packages:
-
-- [Pyinstaller](https://www.pyinstaller.org/)
-
-
-## You may also like...
-
-- [Seafile uploader](https://github.com/BasedOnEvidence/seafile-uploader) - A program for autoupload files on seafile
-
-## License
-
-MIT
-
----
-
-> GitHub [@BasedOnEvidence](https://github.com/BasedOnEvidence/) &nbsp;&middot;&nbsp;
-
-
